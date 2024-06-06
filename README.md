@@ -1,16 +1,31 @@
 # eecamp
 
-A new Flutter project.
+Flutter -> native Kotlin
 
-## Getting Started
+## Brief
 
-This project is a starting point for a Flutter application.
+### lib/widgets/connection_page.dart
+- Create channel
+    ```
+    static const flutterChannel = MethodChannel("com.eecamp.app/flutter");
+    ```
+- Invoke method
+    ```
+    await flutterChannel.invokeMethod("openCamera");
+    ```
+### android/app/src/main/kotlin/com/example/connection_page/MainActivity.kt
+See the code in this file
 
-A few resources to get you started if this is your first Flutter project:
+### android/app/src/main/res/AndroidManifest.xml
+在```<manifest>```中加入
+```xml
+<uses-feature
+    android:name="android.hardware.camera"
+    android:required="false" />
+<uses-permission android:name="android.permission.CAMERA" />
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Reference
+
+- [參考影片](https://youtu.be/j0cy_Z6IG_c?si=LLh3FA0g92_BXzKT)
