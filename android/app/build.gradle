@@ -24,9 +24,10 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.eecamp"
-    compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
-
+//    compileSdk flutter.compileSdkVersion
+//    ndkVersion flutter.ndkVersion
+    compileSdk 34
+    ndkVersion "26.1.10909125"
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -57,6 +58,9 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+    }
+    buildFeatures {
+        viewBinding true
     }
 }
 

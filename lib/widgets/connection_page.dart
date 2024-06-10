@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// import 'package:home_widget/home_widget.dart';
 
 class ConnectionPage extends StatefulWidget {
   
@@ -30,10 +31,10 @@ class _ConnectionPageState extends State<ConnectionPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(5.0),
           child: Text(
             "Connection Page",
-            style: TextStyle(fontSize: 30),
+            style: TextStyle(fontSize: 24),
           ),
         ),
       ),
@@ -43,12 +44,12 @@ class _ConnectionPageState extends State<ConnectionPage> {
           children: [
             Text(
               "Battery Level: $batteryLevel",
-              style: const TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 20),
             TextButton(
               style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 30),
+                textStyle: const TextStyle(fontSize: 18),
                 foregroundColor: ColorScheme.fromSeed(
                   seedColor: Colors.deepPurple
                 ).onPrimary,
@@ -65,7 +66,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
             const SizedBox(height: 20),
             TextButton(
               style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 30),
+                textStyle: const TextStyle(fontSize: 18),
                 foregroundColor: ColorScheme.fromSeed(
                   seedColor: Colors.deepPurple
                 ).onPrimary,
