@@ -68,4 +68,7 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'androidx.glance:glance-appwidget:LATEST-VERSION'
+    implementation "es.antonborri.home_widget:home_widget:latest_version"
+}
