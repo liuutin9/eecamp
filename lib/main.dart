@@ -1,7 +1,10 @@
 import 'package:eecamp/widgets/connection_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 void main() {
+  // if your terminal doesn't support color you'll see annoying logs like `\x1B[1;35m`
+  FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
   runApp(const MyApp());
 }
 
