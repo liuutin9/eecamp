@@ -1,29 +1,45 @@
+import 'package:eecamp/services/bluetooth_service.dart';
+import 'package:eecamp/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.context});
+  final BuildContext context;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   List<BluetoothDevice> devicesList = [];
-  BluetoothDevice? connectedDevice;
-  BluetoothAdapterState bluetoothState = BluetoothAdapterState.unknown;
-  BluetoothCharacteristic? characteristic;
-  TextEditingController messageController = TextEditingController();
+  StreamSubscription? scanSubscription;
+  bool isScanning = false; // Track scanning state
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    FlutterBluePlus.adapterState.listen((state) {
-      setState(() {
-        bluetoothState = state;
-      });
-    });
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+    _animation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOutQuart,
+    ));
+    checkPermissions();
+  }
+
+  @override
+  void dispose() {
+    scanSubscription?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> checkPermissions() async {
@@ -42,148 +58,74 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> startScan() async {
+    setState(() {
+      isScanning = true; // Set scanning state to true
+    });
+
+    _controller.repeat();
+
     await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
-    FlutterBluePlus.scanResults.listen((results) {
-      setState(() {
-        devicesList = results.map((r) => r.device).toList();
-      });
-    });
-  }
-
-  void connectToDevice(BluetoothDevice device) async {
-    await device.connect();
-    setState(() {
-      connectedDevice = device;
-    });
-    discoverServices(device);
-    await FlutterBluePlus.stopScan();
-  }
-
-  void discoverServices(BluetoothDevice device) async {
-    List<BluetoothService> services = await device.discoverServices();
-    for (var service in services) {
-      debugPrint('Service found: ${service.uuid}');
-      for (var char in service.characteristics) {
-        debugPrint('Characteristic found: ${char.uuid}');
-        if (char.properties.write && char.properties.read) {
-          setState(() {
-            characteristic = char;
-          });
-          break;
-        }
+    scanSubscription = FlutterBluePlus.scanResults.listen((results) {
+      if (mounted) {
+        setState(() {
+          devicesList = results.map((r) => r.device).toList();
+        });
       }
-    }
-    if (characteristic == null) {
-      debugPrint('No writable and readable characteristic found');
-    }
-  }
-
-  void disconnectFromDevice() {
-    connectedDevice?.disconnect();
-    setState(() {
-      connectedDevice = null;
-      characteristic = null;
     });
-  }
 
-  void sendMessage(String message) async {
-    if (characteristic != null) {
-      await characteristic!.write(message.codeUnits, withoutResponse: true);
-    }
-  }
-
-  void receiveMessage() async {
-    if (characteristic != null) {
-      var value = await characteristic!.read();
-      String receivedMessage = String.fromCharCodes(value);
-      debugPrint('Received: $receivedMessage');
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Received Message'),
-          content: Text(receivedMessage),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
+    // Wait for the scan to complete before setting the state to false
+    await Future.delayed(const Duration(seconds: 15));
+    if (mounted) {
+      setState(() {
+        isScanning = false; // Set scanning state to false
+      });
+      _controller.stop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Bluetooth App'),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'EECamp Car Controller',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
-        body: Column(
-          children: <Widget>[
-            Text('Bluetooth State: $bluetoothState'),
-            ElevatedButton(
-              onPressed: checkPermissions,
-              child: const Text('Scan for Devices'),
+        actions: [
+          RotationTransition(
+            turns: _animation,
+            child: IconButton(
+              icon: const Icon(Icons.refresh),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              color: Theme.of(context).colorScheme.onPrimary,
+              onPressed: isScanning ? null : checkPermissions,
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: devicesList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(devicesList[index].platformName),
-                    subtitle: Text(devicesList[index].remoteId.toString()),
-                    onTap: () => connectToDevice(devicesList[index]),
-                  );
-                },
-              ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemCount: devicesList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(devicesList[index].platformName == '' ? 'Unknown' : devicesList[index].platformName),
+                  subtitle: Text(devicesList[index].remoteId.toString()),
+                  onTap: () {
+                    Provider.of<BluetoothProvider>(context, listen: false)
+                        .setSelectedDevice(devicesList[index]);
+                    Provider.of<NavigationService>(context, listen: false)
+                        .goControlPanel(deviceId: devicesList[index].remoteId.toString());
+                  },
+                );
+              },
             ),
-            if (connectedDevice != null)
-              Card(
-                margin: const EdgeInsets.all(10),
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Text('Connected to ${connectedDevice?.platformName}'),
-                      ElevatedButton(
-                        onPressed: disconnectFromDevice,
-                        child: const Text('Disconnect'),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: messageController,
-                              decoration: const InputDecoration(
-                                labelText: 'Send Message',
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.send),
-                            onPressed: () {
-                              sendMessage(messageController.text);
-                              messageController.clear();
-                            },
-                          ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: receiveMessage,
-                        child: const Text('Receive Message'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
