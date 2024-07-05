@@ -6,12 +6,10 @@ import 'package:provider/provider.dart';
 class BluetoothProvider extends ChangeNotifier {
   BluetoothDevice? _connectedDevice;
   BluetoothCharacteristic? _characteristic;
-  // BluetoothCharacteristic? _readCharacteristic;
   BluetoothDevice? _selectedDevice;
 
   BluetoothDevice? get connectedDevice => _connectedDevice;
   BluetoothCharacteristic? get characteristic => _characteristic;
-  // BluetoothCharacteristic? get readCharacteristic => _readCharacteristic;
   BluetoothDevice? get selectedDevice => _selectedDevice;
 
   void setSelectedDevice(BluetoothDevice? device) {
@@ -28,11 +26,6 @@ class BluetoothProvider extends ChangeNotifier {
     _characteristic = characteristic;
     notifyListeners();
   }
-
-  // void setReadCharacteristic(BluetoothCharacteristic? characteristic) {
-  //   _readCharacteristic = characteristic;
-  //   notifyListeners();
-  // }
 
   Future<void> connectToDevice(BluetoothDevice device, BuildContext context) async {
     try {
@@ -69,25 +62,6 @@ class BluetoothProvider extends ChangeNotifier {
       var char = service.characteristics.where((ch) => ch.uuid == Guid.fromString('ffe1')).first;
       setCharacteristic(char);
       return true;
-      // for (var service in services) {
-      //   debugPrint('Service found: ${service.uuid}');
-      //   for (var char in service.characteristics) {
-      //     debugPrint('Characteristic found: ${char.uuid}');
-      //     if (char.properties.write && char.properties.read) {
-      //       setCharacteristic(char);
-      //       if (first) {
-      //         setCharacteristic(null);
-      //         first = false;
-      //       }
-      //       // break;
-      //     }
-      //     if (_characteristic != null) {
-      //       debugPrint('Characteristic found this: ${char.uuid}');
-      //       return true;
-      //     }
-      //   }
-      // }
-      // return false;
     } catch (e) {
       debugPrint('Failed to discover services: $e');
       return false;
@@ -97,8 +71,6 @@ class BluetoothProvider extends ChangeNotifier {
   void disconnectFromDevice(BuildContext context) {
     _connectedDevice?.disconnect();
     setConnectedDevice(null);
-    // setWriteCharacteristic(null);
-    // setReadCharacteristic(null);
     setCharacteristic(null);
     setSelectedDevice(null);
     notifyListeners();
