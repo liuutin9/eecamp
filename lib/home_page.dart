@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:eecamp/services/bluetooth_service.dart';
 import 'package:eecamp/services/navigation_service.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +49,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     var bluetoothPermission = await Permission.bluetoothScan.request();
 
     if (locationPermission.isGranted && bluetoothPermission.isGranted) {
+      if (Platform.isAndroid) {
+        await FlutterBluePlus.turnOn();
+      }
       startScan();
     } else if (!locationPermission.isGranted) {
       locationPermission = await Permission.location.request();
