@@ -67,7 +67,7 @@ class BluetoothProvider extends ChangeNotifier {
     }
   }
 
-  void disconnectFromDevice(BuildContext context) {
+  void disconnectFromDevice() {
     _connectedDevice?.disconnect();
     setConnectedDevice(null);
     setCharacteristic(null);
