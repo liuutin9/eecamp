@@ -60,74 +60,84 @@ class _ControlPanelState extends State<ControlPanel> {
       future: bluetooth.connectToDevice(bluetooth.selectedDevice!, context),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 20),
-                  Text('Connecting to ${bluetooth.selectedDevice?.platformName}'),
-                ],
+          return PopScope(
+            canPop: false,
+            child: Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 20),
+                    Text('Connecting to ${bluetooth.selectedDevice?.platformName}'),
+                  ],
+                ),
               ),
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasError) {
-          return Scaffold(
-            body: Center(
-              child: Text('Failed to connect: ${snapshot.error}'),
+          return PopScope(
+            canPop: true,
+            onPopInvoked: (bool didPop) {
+              bluetooth.disconnectFromDevice();
+              Provider.of<NavigationService>(context, listen: false).goHome();
+            },
+            child: Scaffold(
+              body: Center(
+                child: Text('Failed to connect: ${snapshot.error}'),
+              ),
             ),
           );
         } else {
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  bluetooth.disconnectFromDevice(context);
-                  Provider.of<NavigationService>(context, listen: false).goHome();
-                },
+          return PopScope(
+            canPop: true,
+            onPopInvoked: (bool didPop) {
+              bluetooth.disconnectFromDevice();
+              Provider.of<NavigationService>(context, listen: false).goHome();
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    bluetooth.disconnectFromDevice();
+                    Provider.of<NavigationService>(context, listen: false).goHome();
+                  },
+                ),
+                title: Text(bluetooth.selectedDevice?.platformName ?? 'Device'),
               ),
-              title: Text(bluetooth.selectedDevice?.platformName ?? 'Device'),
-            ),
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Connected to ${bluetooth.connectedDevice?.platformName}'),
-                    ElevatedButton(
-                      onPressed: () {
-                        bluetooth.disconnectFromDevice(context);
-                        Provider.of<NavigationService>(context, listen: false).goHome();
-                      },
-                      child: const Text('Disconnect'),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: messageController,
-                            decoration: const InputDecoration(
-                              labelText: 'Send Message',
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Connected to ${bluetooth.connectedDevice?.platformName}'),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: messageController,
+                              decoration: const InputDecoration(
+                                labelText: 'Send Message',
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: () async {
-                            await sendMessage(messageController.text, bluetooth);
-                            messageController.clear();
-                          },
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: () => receiveMessage(bluetooth),
-                      child: const Text('Receive Message'),
-                    ),
-                  ],
+                          IconButton(
+                            icon: const Icon(Icons.send),
+                            onPressed: () async {
+                              await sendMessage(messageController.text, bluetooth);
+                              messageController.clear();
+                            },
+                          ),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: () => receiveMessage(bluetooth),
+                        child: const Text('Receive Message'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
