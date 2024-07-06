@@ -132,56 +132,36 @@ class ControlInterface extends StatefulWidget {
 class _ControlInterfaceState extends State<ControlInterface> {
   MoveStates state = MoveStates.stop;
 
-  void setMoveStates(MoveStates newState) {
+  void sendMessage(String message) {
     BluetoothProvider bluetooth = Provider.of<BluetoothProvider>(context, listen: false);
+    if (bluetooth.characteristic != null) {
+      try {
+        bluetooth.characteristic!.write(message.codeUnits, withoutResponse: true);
+      } catch (e) {
+        debugPrint('Error sending message: $e');
+      }
+    }
+  }
+
+  void setMoveStates(MoveStates newState) {
     setState(() {
       state = newState;
     });
     switch (state) {
       case MoveStates.forward:
-        if (bluetooth.characteristic != null) {
-          try {
-            bluetooth.characteristic!.write('w'.codeUnits, withoutResponse: true);
-          } catch (e) {
-            debugPrint('Error sending message: $e');
-          }
-        }
+        sendMessage('w');
         break;
       case MoveStates.backward:
-        if (bluetooth.characteristic != null) {
-          try {
-            bluetooth.characteristic!.write('s'.codeUnits, withoutResponse: true);
-          } catch (e) {
-            debugPrint('Error sending message: $e');
-          }
-        }
+        sendMessage('s');
         break;
       case MoveStates.left:
-        if (bluetooth.characteristic != null) {
-          try {
-            bluetooth.characteristic!.write('a'.codeUnits, withoutResponse: true);
-          } catch (e) {
-            debugPrint('Error sending message: $e');
-          }
-        }
+        sendMessage('a');
         break;
       case MoveStates.right:
-        if (bluetooth.characteristic != null) {
-          try {
-            bluetooth.characteristic!.write('d'.codeUnits, withoutResponse: true);
-          } catch (e) {
-            debugPrint('Error sending message: $e');
-          }
-        }
+        sendMessage('d');
         break;
       default:
-        if (bluetooth.characteristic != null) {
-          try {
-            bluetooth.characteristic!.write('0'.codeUnits, withoutResponse: true);
-          } catch (e) {
-            debugPrint('Error sending message: $e');
-          }
-        }
+        sendMessage('0');
     }
   }
 

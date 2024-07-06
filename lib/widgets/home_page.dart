@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:eecamp/services/bluetooth_service.dart';
 import 'package:eecamp/services/navigation_service.dart';
 import 'package:flutter/material.dart';
@@ -91,35 +90,51 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
-          'EECamp Car Controller',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-        actions: [
-          RotationTransition(
-            turns: _animation,
-            child: IconButton(
-              icon: const Icon(Icons.refresh),
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              color: Theme.of(context).colorScheme.onPrimary,
-              onPressed: isScanning ? null : checkPermissions,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: <Widget>[
+          SliverAppBar(
+            floating: false,
+            stretch: true,
+            expandedHeight: 200,
+            pinned: true,
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
+            foregroundColor: Theme.of(context).colorScheme.onTertiary,
+            flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const [
+                StretchMode.zoomBackground,
+                StretchMode.blurBackground,
+              ],
+              centerTitle: true,
+              title: Text(
+                'EECamp',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onTertiary,
+                ),
+              ),
+              background: Image.asset(
+                'assets/sliver_app_bar_background.png',
+                fit: BoxFit.fitWidth,
+              ),
             ),
+            actions: [
+              RotationTransition(
+                turns: _animation,
+                child: IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: isScanning ? null : checkPermissions,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              itemCount: devicesList.length,
-              itemBuilder: (context, index) {
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
                 return ListTile(
                   title: Text(devicesList[index].platformName == '' ? 'Unknown' : devicesList[index].platformName),
                   subtitle: Text(devicesList[index].remoteId.toString()),
+                  trailing: const Icon(Icons.bluetooth),
+                  tileColor: Theme.of(context).colorScheme.surfaceContainer,
                   onTap: () {
                     Provider.of<BluetoothProvider>(context, listen: false)
                         .setSelectedDevice(devicesList[index]);
@@ -128,6 +143,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   },
                 );
               },
+              childCount: devicesList.length,
             ),
           ),
         ],

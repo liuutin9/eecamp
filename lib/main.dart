@@ -1,5 +1,6 @@
 import 'package:eecamp/services/bluetooth_service.dart';
 import 'package:eecamp/services/navigation_service.dart';
+import 'package:eecamp/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -46,6 +47,8 @@ class EECampApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: routerConfig,
+      theme: ThemeData(useMaterial3: true, colorScheme: MaterialTheme.lightScheme()),
+      darkTheme: ThemeData(useMaterial3: true, colorScheme: MaterialTheme.darkScheme()),
     );
   }
 

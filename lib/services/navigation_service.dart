@@ -27,14 +27,14 @@ final routerConfig = GoRouter(
         child: HomePage(context: context),
         transitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
+          const begin = Offset(0.5, 0.0);
           const end = Offset.zero;
           const curve = Curves.easeInOutQuart;
 
           final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           final offsetAnimation = animation.drive(tween);
 
-          final exitTween = Tween(begin: Offset.zero, end: const Offset(-1.0, 0.0)).chain(CurveTween(curve: curve));
+          final exitTween = Tween(begin: Offset.zero, end: const Offset(-0.5, 0.0)).chain(CurveTween(curve: curve));
           final exitAnimation = secondaryAnimation.drive(exitTween);
 
           return SlideTransition(
