@@ -1,8 +1,12 @@
-# eecamp
-
-Flutter -> native Kotlin
+# BLE Arduino Car Controller
 
 ## Brief
+
+It is a remote controller of an Arduino car with a BLE board.
+
+## Boards
+- Arduino Board: Arduino Uno
+- Bluetooth Board: BT05
 
 ### lib/widgets/connection_page.dart
 - Create channel
