@@ -1,5 +1,5 @@
-import 'package:eecamp/widgets/control_panel.dart';
-import 'package:eecamp/widgets/home_page.dart';
+import 'package:eecamp/widgets/control_page/control_page.dart';
+import 'package:eecamp/widgets/home_page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -50,7 +50,7 @@ final routerConfig = GoRouter(
         GoRoute(
           path: 'controlPanel/:deviceId',
           pageBuilder: (context, state) => CustomTransitionPage(
-            child: const ControlPanel(),
+            child: const ControlPage(),
             transitionDuration: const Duration(milliseconds: 300),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               const begin = Offset(1.0, 0.0);

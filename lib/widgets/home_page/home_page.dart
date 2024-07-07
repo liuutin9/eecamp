@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:eecamp/services/bluetooth_service.dart';
+import 'package:eecamp/providers/bluetooth_provider.dart';
 import 'package:eecamp/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   List<BluetoothDevice> devicesList = [];
   StreamSubscription? scanSubscription;
-  bool isScanning = false; // Track scanning state
+  bool isScanning = false;
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Future<void> startScan() async {
     setState(() {
-      isScanning = true; // Set scanning state to true
+      isScanning = true;
     });
 
     _controller.repeat();
@@ -77,11 +77,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       }
     });
 
-    // Wait for the scan to complete before setting the state to false
     await Future.delayed(const Duration(seconds: 15));
     if (mounted) {
       setState(() {
-        isScanning = false; // Set scanning state to false
+        isScanning = false;
       });
       _controller.stop();
     }
@@ -129,6 +128,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
+              childCount: devicesList.length,
               (context, index) {
                 return ListTile(
                   title: Text(devicesList[index].platformName == '' ? 'Unknown' : devicesList[index].platformName),
@@ -143,7 +143,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   },
                 );
               },
-              childCount: devicesList.length,
             ),
           ),
         ],

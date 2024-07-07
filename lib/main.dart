@@ -1,4 +1,4 @@
-import 'package:eecamp/services/bluetooth_service.dart';
+import 'package:eecamp/providers/bluetooth_provider.dart';
 import 'package:eecamp/services/navigation_service.dart';
 import 'package:eecamp/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -7,15 +7,12 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
   FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
-  
   runApp(const InitProvider());
 }
 
@@ -24,7 +21,6 @@ class InitProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         Provider<NavigationService>(
@@ -51,5 +47,4 @@ class EECampApp extends StatelessWidget {
       darkTheme: ThemeData(useMaterial3: true, colorScheme: MaterialTheme.darkScheme()),
     );
   }
-
 }
