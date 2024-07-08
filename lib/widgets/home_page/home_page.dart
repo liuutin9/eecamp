@@ -72,7 +72,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     scanSubscription = FlutterBluePlus.scanResults.listen((results) {
       if (mounted) {
         setState(() {
-          devicesList = results.map((r) => r.device).toList();
+          devicesList = results
+              .map((r) => r.device)
+              .where((device) => device.platformName != '')
+              .toList();
         });
       }
     });
@@ -131,7 +134,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               childCount: devicesList.length,
               (context, index) {
                 return ListTile(
-                  title: Text(devicesList[index].platformName == '' ? 'Unknown' : devicesList[index].platformName),
+                  title: Text(devicesList[index].platformName),
                   subtitle: Text(devicesList[index].remoteId.toString()),
                   trailing: const Icon(Icons.bluetooth),
                   tileColor: Theme.of(context).colorScheme.surfaceContainer,
