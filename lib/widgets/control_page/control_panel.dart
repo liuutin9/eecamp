@@ -26,6 +26,7 @@ class _ControlPanelState extends State<ControlPanel> {
     if (!bluetooth.isDisconnected()) {
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (_) {
           return AlertDialog(
             title: const Text("Disconnected"),
