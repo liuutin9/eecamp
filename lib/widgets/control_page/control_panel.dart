@@ -1,3 +1,4 @@
+import 'package:eecamp/services/navigation_service.dart';
 import 'package:eecamp/widgets/animated_hints/animated_hint_backward.dart';
 import 'package:eecamp/widgets/animated_hints/animated_hint_forward.dart';
 import 'package:eecamp/widgets/animated_hints/animated_hint_left.dart';
@@ -20,9 +21,28 @@ class ControlPanel extends StatefulWidget {
 class _ControlPanelState extends State<ControlPanel> {
   MoveStates state = MoveStates.stop;
 
-  void sendMessage(String message) {
+  Future<void> sendMessage(String message) async {
     BluetoothProvider bluetooth = Provider.of<BluetoothProvider>(context, listen: false);
-    if (bluetooth.characteristic != null) {
+    if (!bluetooth.isDisconnected()) {
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: const Text("Disconnected"),
+            icon: const Icon(Icons.bluetooth_disabled),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Provider.of<NavigationService>(context, listen: false).goHome();
+                },
+                child: const Text("Confirm"),
+              ),
+            ],
+          );
+        }
+      );
+    }
+    else if (bluetooth.characteristic != null) {
       try {
         bluetooth.characteristic!.write(message.codeUnits, withoutResponse: true);
       } catch (e) {

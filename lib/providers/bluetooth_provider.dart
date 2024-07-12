@@ -12,6 +12,10 @@ class BluetoothProvider extends ChangeNotifier {
   BluetoothCharacteristic? get characteristic => _characteristic;
   BluetoothDevice? get selectedDevice => _selectedDevice;
 
+  bool isDisconnected() {
+    return _connectedDevice == null ? true : _connectedDevice!.isDisconnected;
+  }
+
   void setSelectedDevice(BluetoothDevice? device) {
     _selectedDevice = device;
     notifyListeners();
